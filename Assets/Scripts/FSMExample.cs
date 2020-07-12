@@ -12,6 +12,7 @@ public class FSMExample : MonoBehaviour
     public float moveSpeed;
     public float healingRate;
     public float maxHealth;
+    public float hearingDistance;
     // Start is called before the first frame update
     void Start()
     {
@@ -81,5 +82,18 @@ public class FSMExample : MonoBehaviour
     public void ChangeState(string newState)
     {
         AIState = newState;
+    }
+
+    private bool CanHear(GameObject target)
+    {
+        // Get target noise maker
+        NoiseMaker targetNoiseMaker = target.GetComponent<NoiseMaker>();
+        // if they don't have a noise maker, we can't hear them.
+        if(targetNoiseMaker == null) { return false; }
+        // if the distance between us and the target is less than the sum of the noise distance, we can hear it
+        float distanceToTarget = Vector3.Distance(transform.position, target.transform.position);
+        if ((targetNoiseMaker.volumeDistance + hearingDistance) > distanceToTarget) { return true; }
+
+        return false;
     }
 }
