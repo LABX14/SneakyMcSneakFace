@@ -13,6 +13,8 @@ public class FSMExample : MonoBehaviour
     public float healingRate;
     public float maxHealth;
     public float hearingDistance;
+    public float fieldOfView = 90f;
+    public float visionMaxDistance = 40f; 
     // Start is called before the first frame update
     void Start()
     {
@@ -88,12 +90,33 @@ public class FSMExample : MonoBehaviour
     {
         // Get target noise maker
         NoiseMaker targetNoiseMaker = target.GetComponent<NoiseMaker>();
+
         // if they don't have a noise maker, we can't hear them.
         if(targetNoiseMaker == null) { return false; }
         // if the distance between us and the target is less than the sum of the noise distance, we can hear it
         float distanceToTarget = Vector3.Distance(transform.position, target.transform.position);
         if ((targetNoiseMaker.volumeDistance + hearingDistance) > distanceToTarget) { return true; }
 
+        return false;
+    }
+
+    private bool CanSee(GameObject target)
+    {
+        Vector3 vectorToTarget = target.transform.position - transform.position;
+
+        float angleToTarget = Vector3.Angle(vectorToTarget, transform.up);
+
+        // Check if the target is within the field of view.
+        if(angleToTarget < fieldOfView)
+        {
+            // Use a raycast to see if there are obstructions between us and the target. 
+            RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, vectorToTarget, visionMaxDistance);
+
+            if(hitInfo.collider.gameObject == target)
+            {
+                return true;
+            }
+        }
         return false;
     }
 }
